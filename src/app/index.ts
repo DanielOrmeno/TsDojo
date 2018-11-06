@@ -1,11 +1,12 @@
 import * as inquirer from 'inquirer';
 import chalk from 'chalk';
 
-import { buildOptions } from './optionBuilder';
-import { HandlerFactory } from './taskHandlerFactory';
+import { buildOptions } from '@/classes/optionBuilder';
+import { HandlerFactory } from '@/classes/taskHandlerFactory';
 import { Logo } from '../../assets/logo';
 
 const appConfig = require('../../package.json');
+const { spawn } = require('child_process');
 
 export class App {
     private shouldExit = false;
@@ -23,12 +24,13 @@ export class App {
 
     private async processInput(input: any) {
         const { task, kata } = input;
-    
+
         console.log(`\n${chalk.cyanBright(task, kata)}\n`);
-    
-        const factory = new HandlerFactory();
-        const handler = factory.getHandler(input)
-        return handler.RunAsync();
+
+        const child = spawn('node worker.js');
+        // const factory = new HandlerFactory();
+        // const handler = factory.getHandler(input)
+        // return handler.RunAsync();
     }
 
     private async confirmContinue() {

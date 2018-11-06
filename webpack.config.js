@@ -1,7 +1,10 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: {
+    app: './src/index.ts',
+    worker: './src/worker/index.ts'
+  },
   devtool: 'inline-source-map',
   mode: "none",
   target: "node",
@@ -21,7 +24,7 @@ module.exports = {
     } 
   },
   output: {
-    filename: 'app.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dist')
   }
 };

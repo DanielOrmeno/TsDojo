@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Ts Dojo. Test, Run and Benchmark Katas",
   "scripts": {
+    "start": "webpack && node dist/app.js",
     "test": "test"
   },
   "author": "Daniel Ormeno",

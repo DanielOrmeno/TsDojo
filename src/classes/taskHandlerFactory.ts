@@ -1,34 +1,6 @@
-import { Runner } from './constants';
-import { Katas } from '@/katas';
-import { KataTestRunner } from '@/tasks/KataTestRunner';
 import { IRunner } from '@/tasks/IRunner';
-import { KataDescriber } from '@/tasks/Describer';
-
-export class KataFactory {
-    private katas: any = Katas;
-
-    public getKata(kata: string) {
-        return this.katas[kata];
-    }
-}
-
-export class TaskFactory {
-    private tasks: Map<Runner, any>;
-
-    constructor() {
-        this.tasks = new Map<Runner, any>();
-        this.tasks.set(Runner.Describe, KataDescriber)
-        this.tasks.set(Runner.Test, KataTestRunner);
-    }
-
-    public getTask(runner: Runner) {
-        if (!this.tasks.has(runner)) {
-            throw new Error(`Unable to resolve runner for key ${runner}`);
-        }
-
-        return this.tasks.get(runner)
-    }
-}
+import { KataFactory } from './kataFactory';
+import { TaskFactory } from './taskFactory';
 
 export class HandlerFactory {
     private kataFactory: KataFactory;

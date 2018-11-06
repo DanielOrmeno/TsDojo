@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { App } from '@/classes/bootstrapper';
+import { App } from '@/app';
 
 try {
     const app = new App();
