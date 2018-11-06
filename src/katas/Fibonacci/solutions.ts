@@ -3,7 +3,7 @@ import { ISolution } from "@/classes/Solution";
 export const fiboIterative: ISolution = {
     author: 'Daniel Ormeno',
     name: 'Iterative Approach',
-    runAsync: async (n: number) => {
+    run: (n: number) => {
         if (n === 0) return 0;
         if (n === 1 || n === 2) return 1;
 
@@ -19,7 +19,7 @@ export const fiboIterative: ISolution = {
 export const fiboRecursive: ISolution = {
     author: 'Daniel Ormeno',
     name: 'Recursive Approach',
-    runAsync: async (n: number) => {
+    run: (n: number) => {
         function fibo (n: any): number {
             if (n === 0) return 0;
             if (n === 1 || n === 2) return 1;
@@ -34,7 +34,7 @@ export const fiboRecursive: ISolution = {
 export const fiboDynamic: ISolution = {
     author: 'Daniel Ormeno',
     name: 'Dynamic Programming',
-    runAsync: async (n: number) => {
+    run: (n: number) => {
         function dynamic(n: any, cache: Map<number, number> = null): number {
             if (n <= 0) return 0;
             if (n === 1 || n === 2) return 1;

@@ -4,49 +4,61 @@ import { ITestCase } from '@/classes/TestCase';
 import { ISolution } from '@/classes/Solution';
 import { IRunner } from './IRunner';
 import chalk from 'chalk';
+import { IKata } from '@/classes/Kata';
+
+const { fork } = require('child_process');
 
 export class KataTestRunner implements IRunner {
     public Solutions: ISolution[];
     public TestCases: ITestCase[];
+    private children: any[];
+    private kata: string;
 
-    constructor(testcases: ITestCase[], solutions: ISolution[]) {
-        this.Solutions = solutions;
-        this.TestCases = testcases;
+    constructor(kata: IKata) {
+        this.Solutions = kata.solutions;
+        this.TestCases = kata.testCases;
+        this.kata = kata.name;
+        this.children = [];
     }
 
-    public async RunAsync(): Promise<void> {
+    public RunAsync() {
         if (this.Solutions.length <= 0) {
             console.log(chalk.yellow('No solutions found for this Kata'));
         }
 
+        const spinner = ora().start();
         for(let i = 0; i < this.Solutions.length; i++) {
             const sol = this.Solutions[i];
-            console.log(chalk.cyanBright(`Solution: ${sol.name}`), chalk.gray(`by ${sol.author}\n`));
-            await this.testSolutionAsync(sol, this.TestCases);
-            console.log('\n');
+
+            const child = fork('dist/testWorker.js', ['-k', this.kata ,'-s', sol.name]);
+            child.on('message', ($event: any) => this.OnChildEvent($event, spinner));
+
+            this.children.push({ name: sol.name, child, completed: false });
         }
     }
 
-    private async testSolutionAsync(solution: ISolution, testCases: ITestCase[]) {
-        for (let i = 0; i < this.TestCases.length; i++) {
-            const testCase = this.TestCases[i];
-            const spinner = ora(`Running test case ${testCase.Test} ...\n`).start();
-            try {
-                const result = await solution.runAsync(testCase.Test);
-                const passed = this.assert(result, testCase.Expected, testCase.Comparer);
+    private OnChildEvent($event: any, spinner: any) {
+        if(!$event || !$event.results) {
+            return;
+        }
 
-                if (passed) {
-                    spinner.succeed(`Test ${i + 1} passed!`);
-                } else {
-                    spinner.fail(`Test ${i + 1} failed. Expected ${testCase.Expected}, Actual ${result}`);
-                }
-            } catch (error) {
-                spinner.fail(`ERROR: ${error.message} for test case ${testCase.Test}`);
+        this.children.find(c => c.name === $event.solution).completed = true;
+
+        spinner.clear();
+        const allPassed = $event.results.every((t: any) => t.passed);
+        console.log(chalk.cyanBright(`${$event.solution} ${allPassed ? '🚀' : '💩'}`), chalk.gray(`- by ${$event.author}`))
+        
+        $event.results.forEach((r: any) => {
+            if (r.passed) {
+                spinner.succeed(r.message);
+            } else {
+                spinner.fail(r.message);
             }
+        });
+
+        if (!this.children.every(c => c.completed)) {
+            spinner.start();
         }
-    }
- 
-    private assert(actual: any, expected: any, comparer: any) {
-        return comparer(actual, expected);
+        console.log('\n');
     }
 }

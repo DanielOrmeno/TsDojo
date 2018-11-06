@@ -5,8 +5,10 @@ import { IKata } from '@/classes/Kata';
 
 const testCases = [ fibo0, fibo1, fibo2, fibo5 ];
 const solutions = [ fiboIterative, fiboRecursive, fiboDynamic ];
+const name = 'Fibonacci';
 
 export const Fibonacci: IKata = {
+    name,
     description,
     testCases,
     solutions

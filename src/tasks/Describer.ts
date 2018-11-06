@@ -2,16 +2,17 @@ import { IRunner } from "./IRunner";
 import { ISolution } from "@/classes/Solution";
 import { ITestCase } from "@/classes/TestCase";
 import chalk from "chalk";
+import { IKata } from "@/classes/Kata";
 
 export class KataDescriber implements IRunner {
     public Solutions: ISolution[];
     public TestCases: ITestCase[];
     public Description: string;
 
-    constructor(testcases: ITestCase[], solutions: ISolution[], desc: string) {
-        this.Solutions = solutions;
-        this.TestCases = testcases;
-        this.Description = desc;
+    constructor(kata: IKata) {
+        this.Solutions = kata.solutions;
+        this.TestCases = kata.testCases;
+        this.Description = kata.description;
     }
 
     public RunAsync() {

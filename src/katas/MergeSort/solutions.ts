@@ -24,13 +24,13 @@ function merge<T>(arr1: T[], arr2: T[], callback: any) {
 }
 
 function descending (a: number, b: number) {
-    return a <= b;
+    return a < b;
 }
 
 export const HighOrderFunctions: ISolution = {
     name: 'Using Higher order functions Ascending',
     author: 'Daniel Ormeno',
-    runAsync: (arr: number[]) => {
+    run: (arr: number[]) => {
         return arr.map(c => [c]).reduce((a, b) => merge(a, b, descending));
     }
 }
@@ -38,13 +38,13 @@ export const HighOrderFunctions: ISolution = {
 export const Recursive: ISolution = {
     name: 'Recursive Approach Ascending',
     author: 'Daniel Ormeno',
-    runAsync: async (arr: number[]) => {
+    run: async (arr: number[]) => {
         function sort(arr: number[], sortingFunc: any) : number[] {
             if (arr.length <= 1) {
                 return arr;
             }
         
-            const half = Math.floor(arr.length/ 2);
+            const half = Math.floor(arr.length/2);
             const left = sort(arr.slice(0, half), sortingFunc);
             const right = sort(arr.slice(half), sortingFunc);
         

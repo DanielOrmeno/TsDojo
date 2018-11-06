@@ -6,7 +6,6 @@ import { HandlerFactory } from '@/classes/taskHandlerFactory';
 import { Logo } from '../../assets/logo';
 
 const appConfig = require('../../package.json');
-const { spawn } = require('child_process');
 
 export class App {
     private shouldExit = false;
@@ -17,20 +16,18 @@ export class App {
             this.printHeader();
     
             const input = await inquirer.prompt(buildOptions());
-            await this.processInput(input);
+            this.processInput(input);
             await this.confirmContinue();
         }
     }
 
-    private async processInput(input: any) {
+    private processInput(input: any) {
         const { task, kata } = input;
 
         console.log(`\n${chalk.cyanBright(task, kata)}\n`);
-
-        const child = spawn('node worker.js');
-        // const factory = new HandlerFactory();
-        // const handler = factory.getHandler(input)
-        // return handler.RunAsync();
+        const factory = new HandlerFactory();
+        const handler = factory.getHandler(input)
+        return handler.RunAsync();
     }
 
     private async confirmContinue() {
