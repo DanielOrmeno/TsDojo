@@ -15,9 +15,23 @@ export class KataFactory {
         return solutions.find(s => s.name === name);
     }
 
-    public getTestCases(kata: string) {
+    public getTests(kata: string) {
+        const k = this.getKata(kata);
+        return k.testCases;
+    }
+
+    public getTestCasesGenerator(kata: string) {
         const k = this.getKata(kata);
 
-        return k.testCases;
+        const testCases = k.testCases;
+
+        function* testCaseGenerator() {
+            const cases = [...testCases];
+            do {
+                yield cases.pop();
+            } while (cases.length !== 0);
+        }
+
+        return testCaseGenerator;
     }
 }

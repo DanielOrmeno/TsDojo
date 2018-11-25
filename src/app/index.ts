@@ -9,6 +9,11 @@ const appConfig = require('../../package.json');
 
 export class App {
     private shouldExit = false;
+    private factory: HandlerFactory;
+
+    constructor() {
+        this.factory = new HandlerFactory
+    }
 
     public async RunAsync() {
         while(!this.shouldExit) {
@@ -25,8 +30,7 @@ export class App {
         const { task, kata } = input;
 
         console.log(`\n${chalk.cyanBright(task, kata)}\n`);
-        const factory = new HandlerFactory();
-        const handler = factory.getHandler(input)
+        const handler = this.factory.getHandler(input)
         return handler.RunAsync();
     }
 

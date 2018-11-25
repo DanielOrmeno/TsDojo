@@ -1,6 +1,6 @@
 import * as commander from 'commander';
 import { KataFactory } from '@/classes/kataFactory';
-import { timingSafeEqual } from 'crypto';
+import { TestResult } from '@/classes/TestCase';
 
 const appConfig = require('../../package.json');
 
@@ -8,8 +8,8 @@ commander
 .version(appConfig.version, '-v, --version')
     .option('-k, --kata [name]')
     .option('-s, --solution [name]')
-    .parse(process.argv);    
-const results: any[] = [];
+    .parse(process.argv);
+
 const {kata, solution} = commander;
 
 if (!kata || !solution) {
@@ -17,37 +17,26 @@ if (!kata || !solution) {
 }
 
 const factory = new KataFactory();
-const testCases = factory.getTestCases(kata);
 const task = factory.getSolution(kata, solution);
-
-function assert(actual: any, expected: any, comparer: any) {
-    return comparer(actual, expected);
-}
+const generator = factory.getTestCasesGenerator(kata)();
 
 function run() {
-    for (let i = 0; i < testCases.length; i++) {
-        const testCase = testCases[i];
-        const testResult = {
-            test: testCase.Test,
-            expected: testCase.Expected,
-            passed: false,
-            message: ''
-        };
-    
+    const results: TestResult[] = [];
+    let count = 1;
+    for (let test = generator.next(); !test.done; test = generator.next()) {
+        const testResult = new TestResult(test.value, count++);
+
         try {
-            const result = task.run(testCase.Test);
-            const passed = assert(result, testCase.Expected, testCase.Comparer);
-    
-            testResult.passed = passed;
-            testResult.message = `Test ${i + 1} ${passed ? 'passed!' : `failed. Expected ${testCase.Expected}, Actual ${result}`}`;
+            const result = task.run(testResult.test);
+            testResult.assert(result);
         } catch (error) {
             testResult.passed = false;
-            testResult.message = `ERROR: ${error.message} for test case ${testCase.Test}`;
+            testResult.message = `ERROR: ${error.message} for test case ${testResult.test}`;
         }
-    
+
         results.push(testResult);
     }
-    
+
     process.send({ solution, author: task.author, results })
 }
 
